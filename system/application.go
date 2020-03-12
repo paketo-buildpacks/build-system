@@ -65,12 +65,12 @@ func NewApplication(applicationPath string, command string, defaultArguments []s
 }
 
 func (a Application) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
-	layer, err := a.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
-		a.Logger.Body(bard.FormatUserConfig("BP_BUILD_ARGUMENTS", "the arguments passed to the build system",
-			strings.Join(a.DefaultArguments, " ")))
-		a.Logger.Body(bard.FormatUserConfig("BP_BUILT_ARTIFACT", "the built application artifact", a.DefaultTarget))
-		a.Logger.Body(bard.FormatUserConfig("BP_BUILT_MODULE", "the module to find application artifact in", "<ROOT>"))
+	a.Logger.Body(bard.FormatUserConfig("BP_BUILD_ARGUMENTS", "the arguments passed to the build system",
+		strings.Join(a.DefaultArguments, " ")))
+	a.Logger.Body(bard.FormatUserConfig("BP_BUILT_ARTIFACT", "the built application artifact", a.DefaultTarget))
+	a.Logger.Body(bard.FormatUserConfig("BP_BUILT_MODULE", "the module to find application artifact in", "<ROOT>"))
 
+	layer, err := a.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
 		arguments, err := a.ResolveArguments()
 		if err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to resolve arguments: %w", err)
