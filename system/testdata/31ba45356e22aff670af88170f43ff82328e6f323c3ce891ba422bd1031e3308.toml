@@ -1,0 +1,5 @@
+id = "maven"
+version = "1.1.1"
+uri = "https://localhost/stub-maven.tar.gz"
+sha256 = "31ba45356e22aff670af88170f43ff82328e6f323c3ce891ba422bd1031e3308"
+stacks = [ "test-stack-id" ]

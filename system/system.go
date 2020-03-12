@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package main
+package system
 
 import (
-	"github.com/paketo-buildpacks/build-system/system"
+	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 )
 
-func main() {
-	b := system.NewBuild()
-	libpak.Build(b.Build)
+//go:generate mockery -name System -case=underscore
+
+type System interface {
+	CachePath() (string, error)
+	Detect(context libcnb.DetectContext, result *libcnb.DetectResult) error
+	DefaultArguments() []string
+	DefaultTarget() string
+	Distribution(layersPath string) string
+	DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error)
+	Participate(resolver libpak.PlanEntryResolver) (bool, error)
+	Wrapper() string
 }

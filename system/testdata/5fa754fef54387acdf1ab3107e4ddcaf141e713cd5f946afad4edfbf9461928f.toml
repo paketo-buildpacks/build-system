@@ -1,0 +1,5 @@
+id = "gradle"
+version = "1.1.1"
+uri = "https://localhost/stub-gradle.zip"
+sha256 = "5fa754fef54387acdf1ab3107e4ddcaf141e713cd5f946afad4edfbf9461928f"
+stacks = [ "test-stack-id" ]

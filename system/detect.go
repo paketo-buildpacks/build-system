@@ -14,14 +14,30 @@
  * limitations under the License.
  */
 
-package main
+package system
 
 import (
-	"github.com/paketo-buildpacks/build-system/system"
-	"github.com/paketo-buildpacks/libpak"
+	"fmt"
+
+	"github.com/buildpacks/libcnb"
 )
 
-func main() {
-	b := system.NewBuild()
-	libpak.Build(b.Build)
+type Detect struct {
+	Systems []System
+}
+
+func NewDetect() Detect {
+	return Detect{Systems: []System{Gradle{}, Maven{}}}
+}
+
+func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
+	result := libcnb.DetectResult{}
+
+	for _, s := range d.Systems {
+		if err := s.Detect(context, &result); err != nil {
+			return libcnb.DetectResult{}, fmt.Errorf("unable to detect: %w", err)
+		}
+	}
+
+	return result, nil
 }

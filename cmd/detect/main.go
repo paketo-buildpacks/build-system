@@ -16,5 +16,12 @@
 
 package main
 
+import (
+	"github.com/paketo-buildpacks/build-system/system"
+	"github.com/paketo-buildpacks/libpak"
+)
+
 func main() {
+	d := system.NewDetect()
+	libpak.Detect(d.Detect)
 }

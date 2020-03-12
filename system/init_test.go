@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package main
+package system_test
 
 import (
-	"github.com/paketo-buildpacks/build-system/system"
-	"github.com/paketo-buildpacks/libpak"
+	"testing"
+
+	"github.com/sclevine/spec"
+	"github.com/sclevine/spec/report"
 )
 
-func main() {
-	b := system.NewBuild()
-	libpak.Build(b.Build)
+func TestUnit(t *testing.T) {
+	suite := spec.New("system", spec.Report(report.Terminal{}))
+	suite("Application", testApplication)
+	suite("Build", testBuild)
+	suite("Cache", testCache)
+	suite("Detect", testDetect)
+	suite("Gradle", testGradle)
+	suite("Maven", testMaven)
+	suite.Run(t)
 }
