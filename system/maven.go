@@ -29,15 +29,16 @@ import (
 )
 
 type MavenDistribution struct {
-	Crush            crush.Crush
 	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
 }
 
 func (m MavenDistribution) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+	m.LayerContributor.Logger = m.Logger
+
 	return m.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		m.Logger.Body("Expanding to %s", layer.Path)
-		if err := m.Crush.ExtractTarGz(artifact, layer.Path, 1); err != nil {
+		if err := crush.ExtractTarGz(artifact, layer.Path, 1); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to expand Maven: %w", err)
 		}
 
@@ -51,7 +52,9 @@ func (MavenDistribution) Name() string {
 	return "maven"
 }
 
-type Maven struct{}
+type Maven struct {
+	Logger bard.Logger
+}
 
 func (Maven) CachePath() (string, error) {
 	u, err := user.Current()
@@ -98,7 +101,7 @@ func (Maven) Distribution(layersPath string) string {
 	return filepath.Join(layersPath, "maven", "bin", "mvn")
 }
 
-func (Maven) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error) {
+func (m Maven) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error) {
 	dep, err := resolver.Resolve("maven", "")
 	if err != nil {
 		return nil, fmt.Errorf("unable to find depdency: %w", err)
@@ -106,7 +109,7 @@ func (Maven) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.
 
 	return MavenDistribution{
 		LayerContributor: libpak.NewDependencyLayerContributor(dep, cache, plan),
-		Logger:           bard.NewLogger(os.Stdout),
+		Logger:           m.Logger,
 	}, nil
 }
 

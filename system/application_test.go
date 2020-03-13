@@ -27,6 +27,7 @@ import (
 	"github.com/buildpacks/libcnb"
 	. "github.com/onsi/gomega"
 	"github.com/paketo-buildpacks/build-system/system"
+	"github.com/paketo-buildpacks/libpak/bard"
 	"github.com/paketo-buildpacks/libpak/effect"
 	"github.com/paketo-buildpacks/libpak/effect/mocks"
 	"github.com/sclevine/spec"
@@ -74,6 +75,7 @@ func testApplication(t *testing.T, context spec.G, it spec.S) {
 		Expect(in.Close()).To(Succeed())
 		Expect(out.Close()).To(Succeed())
 
+		application.Logger = bard.NewLogger(ioutil.Discard)
 		executor.On("Execute", mock.Anything).Return(nil)
 
 		layer, err := ctx.Layers.Layer("test-layer")

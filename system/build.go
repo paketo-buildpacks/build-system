@@ -31,13 +31,6 @@ type Build struct {
 	Systems []System
 }
 
-func NewBuild() Build {
-	return Build{
-		Logger:  bard.NewLogger(os.Stdout),
-		Systems: []System{Gradle{}, Maven{}},
-	}
-}
-
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	pr := libpak.PlanEntryResolver{Plan: context.Plan}
 
@@ -47,6 +40,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 
 	dc := libpak.NewDependencyCache(context.Buildpack)
+	dc.Logger = b.Logger
 
 	b.Logger.Title(context.Buildpack)
 	result := libcnb.BuildResult{}
@@ -78,14 +72,16 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		if err != nil {
 			return libcnb.BuildResult{}, fmt.Errorf("unable to determine cache location: %w", err)
 		}
-		result.Layers = append(result.Layers, NewCache(cache))
+		c := NewCache(cache)
+		c.Logger = b.Logger
+		result.Layers = append(result.Layers, c)
 
-		run, err := NewApplication(context.Application.Path, command, s.DefaultArguments(), s.DefaultTarget())
+		a, err := NewApplication(context.Application.Path, command, s.DefaultArguments(), s.DefaultTarget())
 		if err != nil {
-			return libcnb.BuildResult{}, fmt.Errorf("unable to create run layer: %w", err)
+			return libcnb.BuildResult{}, fmt.Errorf("unable to create application layer: %w", err)
 		}
-
-		result.Layers = append(result.Layers, run)
+		a.Logger = b.Logger
+		result.Layers = append(result.Layers, a)
 	}
 
 	return result, nil

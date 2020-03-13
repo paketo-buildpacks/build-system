@@ -26,10 +26,6 @@ type Detect struct {
 	Systems []System
 }
 
-func NewDetect() Detect {
-	return Detect{Systems: []System{Gradle{}, Maven{}}}
-}
-
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{}
 

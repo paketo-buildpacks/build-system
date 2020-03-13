@@ -17,11 +17,18 @@
 package main
 
 import (
+	"os"
+
 	"github.com/paketo-buildpacks/build-system/system"
 	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
 )
 
 func main() {
-	b := system.NewBuild()
-	libpak.Build(b.Build)
+	logger := bard.NewLogger(os.Stdout)
+
+	libpak.Build(system.Build{
+		Logger:  logger,
+		Systems: []system.System{system.Gradle{Logger: logger}, system.Maven{Logger: logger}},
+	})
 }

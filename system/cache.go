@@ -31,10 +31,7 @@ type Cache struct {
 }
 
 func NewCache(path string) Cache {
-	return Cache{
-		Logger: bard.NewLogger(os.Stdout),
-		Path:   path,
-	}
+	return Cache{Path: path}
 }
 
 func (c Cache) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {

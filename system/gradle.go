@@ -29,15 +29,16 @@ import (
 )
 
 type GradleDistribution struct {
-	Crush            crush.Crush
 	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
 }
 
 func (g GradleDistribution) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
+	g.LayerContributor.Logger = g.Logger
+
 	return g.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		g.Logger.Body("Expanding to %s", layer.Path)
-		if err := g.Crush.ExtractZip(artifact, layer.Path, 1); err != nil {
+		if err := crush.ExtractZip(artifact, layer.Path, 1); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to expand Gradle: %w", err)
 		}
 
@@ -51,7 +52,9 @@ func (GradleDistribution) Name() string {
 	return "gradle"
 }
 
-type Gradle struct{}
+type Gradle struct {
+	Logger bard.Logger
+}
 
 func (Gradle) Detect(context libcnb.DetectContext, result *libcnb.DetectResult) error {
 	files := []string{
@@ -104,7 +107,7 @@ func (Gradle) Distribution(layersPath string) string {
 	return filepath.Join(layersPath, "gradle", "bin", "gradle")
 }
 
-func (Gradle) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error) {
+func (g Gradle) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error) {
 	dep, err := resolver.Resolve("gradle", "")
 	if err != nil {
 		return nil, fmt.Errorf("unable to find depdency: %w", err)
@@ -112,7 +115,7 @@ func (Gradle) DistributionLayer(resolver libpak.DependencyResolver, cache libpak
 
 	return GradleDistribution{
 		LayerContributor: libpak.NewDependencyLayerContributor(dep, cache, plan),
-		Logger:           bard.NewLogger(os.Stdout),
+		Logger:           g.Logger,
 	}, nil
 }
 

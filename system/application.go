@@ -38,7 +38,6 @@ import (
 type Application struct {
 	ApplicationPath  string
 	Command          string
-	Crush            crush.Crush
 	DefaultArguments []string
 	DefaultTarget    string
 	Executor         effect.Executor
@@ -60,7 +59,6 @@ func NewApplication(applicationPath string, command string, defaultArguments []s
 		DefaultTarget:    defaultTarget,
 		Executor:         effect.NewExecutor(),
 		LayerContributor: libpak.NewLayerContributor("Compiled Application", expected),
-		Logger:           bard.NewLogger(os.Stdout),
 	}, nil
 }
 
@@ -69,6 +67,8 @@ func (a Application) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 		strings.Join(a.DefaultArguments, " ")))
 	a.Logger.Body(bard.FormatUserConfig("BP_BUILT_ARTIFACT", "the built application artifact", a.DefaultTarget))
 	a.Logger.Body(bard.FormatUserConfig("BP_BUILT_MODULE", "the module to find application artifact in", "<ROOT>"))
+
+	a.LayerContributor.Logger = a.Logger
 
 	layer, err := a.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
 		arguments, err := a.ResolveArguments()
@@ -129,7 +129,7 @@ func (a Application) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	}
 	defer in.Close()
 
-	if err := a.Crush.ExtractZip(in, a.ApplicationPath, 0); err != nil {
+	if err := crush.ExtractZip(in, a.ApplicationPath, 0); err != nil {
 		return libcnb.Layer{}, fmt.Errorf("unable to extract %s: %w", file, err)
 	}
 
