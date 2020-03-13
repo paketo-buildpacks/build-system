@@ -31,7 +31,7 @@ func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error
 
 	for _, s := range d.Systems {
 		if err := s.Detect(context, &result); err != nil {
-			return libcnb.DetectResult{}, fmt.Errorf("unable to detect: %w", err)
+			return libcnb.DetectResult{}, fmt.Errorf("unable to detect\n%w", err)
 		}
 	}
 

@@ -39,7 +39,7 @@ func (g GradleDistribution) Contribute(layer libcnb.Layer) (libcnb.Layer, error)
 	return g.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		g.Logger.Body("Expanding to %s", layer.Path)
 		if err := crush.ExtractZip(artifact, layer.Path, 1); err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to expand Gradle: %w", err)
+			return libcnb.Layer{}, fmt.Errorf("unable to expand Gradle\n%w", err)
 		}
 
 		layer.Build = true
@@ -67,7 +67,7 @@ func (Gradle) Detect(context libcnb.DetectContext, result *libcnb.DetectResult) 
 		if os.IsNotExist(err) {
 			continue
 		} else if err != nil {
-			return fmt.Errorf("unable to determine if %s exists: %w", f, err)
+			return fmt.Errorf("unable to determine if %s exists\n%w", f, err)
 		}
 
 		result.Pass = true
@@ -89,7 +89,7 @@ func (Gradle) Detect(context libcnb.DetectContext, result *libcnb.DetectResult) 
 func (Gradle) CachePath() (string, error) {
 	u, err := user.Current()
 	if err != nil {
-		return "", fmt.Errorf("unable to determine user home directory: %w", err)
+		return "", fmt.Errorf("unable to determine user home directory\n%w", err)
 	}
 
 	return filepath.Join(u.HomeDir, ".gradle"), nil
@@ -110,7 +110,7 @@ func (Gradle) Distribution(layersPath string) string {
 func (g Gradle) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error) {
 	dep, err := resolver.Resolve("gradle", "")
 	if err != nil {
-		return nil, fmt.Errorf("unable to find depdency: %w", err)
+		return nil, fmt.Errorf("unable to find depdency\n%w", err)
 	}
 
 	return GradleDistribution{
@@ -122,7 +122,7 @@ func (g Gradle) DistributionLayer(resolver libpak.DependencyResolver, cache libp
 func (Gradle) Participate(resolver libpak.PlanEntryResolver) (bool, error) {
 	_, ok, err := resolver.Resolve("gradle")
 	if err != nil {
-		return false, fmt.Errorf("unable to resolve gradle plan entry: %w", err)
+		return false, fmt.Errorf("unable to resolve gradle plan entry\n%w", err)
 	}
 
 	return ok, nil

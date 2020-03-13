@@ -48,7 +48,7 @@ type Application struct {
 func NewApplication(applicationPath string, command string, defaultArguments []string, defaultTarget string) (Application, error) {
 	l, err := sherpa.NewFileListing(applicationPath)
 	if err != nil {
-		return Application{}, fmt.Errorf("unable to create file listing for %s: %w", applicationPath, err)
+		return Application{}, fmt.Errorf("unable to create file listing for %s\n%w", applicationPath, err)
 	}
 	expected := map[string][]sherpa.FileEntry{"files": l}
 
@@ -73,7 +73,7 @@ func (a Application) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	layer, err := a.LayerContributor.Contribute(layer, func() (libcnb.Layer, error) {
 		arguments, err := a.ResolveArguments()
 		if err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to resolve arguments: %w", err)
+			return libcnb.Layer{}, fmt.Errorf("unable to resolve arguments\n%w", err)
 		}
 
 		a.Logger.Body("Executing %s %s", filepath.Base(a.Command), strings.Join(arguments, " "))
@@ -84,53 +84,53 @@ func (a Application) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 			Stdout:  a.Logger.InfoWriter(),
 			Stderr:  a.Logger.InfoWriter(),
 		}); err != nil {
-			return libcnb.Layer{}, fmt.Errorf("error running build: %w", err)
+			return libcnb.Layer{}, fmt.Errorf("error running build\n%w", err)
 		}
 
 		artifact, err := a.ResolveArtifact()
 		if err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to resolve artifact: %w", err)
+			return libcnb.Layer{}, fmt.Errorf("unable to resolve artifact\n%w", err)
 		}
 
 		in, err := os.Open(artifact)
 		if err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to open %s: %w", artifact, err)
+			return libcnb.Layer{}, fmt.Errorf("unable to open %s\n%w", artifact, err)
 		}
 		defer in.Close()
 
 		file := filepath.Join(layer.Path, "application.zip")
 		if err := sherpa.CopyFile(in, file); err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to copy %s to %s: %w", artifact, file, err)
+			return libcnb.Layer{}, fmt.Errorf("unable to copy %s to %s\n%w", artifact, file, err)
 		}
 
 		layer.Cache = true
 		return layer, nil
 	})
 	if err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to contribute application layer: %w", err)
+		return libcnb.Layer{}, fmt.Errorf("unable to contribute application layer\n%w", err)
 	}
 
 	a.Logger.Header("Removing source code")
 	cs, err := ioutil.ReadDir(a.ApplicationPath)
 	if err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to list children of %s: %w", a.ApplicationPath, err)
+		return libcnb.Layer{}, fmt.Errorf("unable to list children of %s\n%w", a.ApplicationPath, err)
 	}
 	for _, c := range cs {
 		file := filepath.Join(a.ApplicationPath, c.Name())
 		if err := os.RemoveAll(file); err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to remove %s: %w", file, err)
+			return libcnb.Layer{}, fmt.Errorf("unable to remove %s\n%w", file, err)
 		}
 	}
 
 	file := filepath.Join(layer.Path, "application.zip")
 	in, err := os.Open(file)
 	if err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to open %s: %w", file, err)
+		return libcnb.Layer{}, fmt.Errorf("unable to open %s\n%w", file, err)
 	}
 	defer in.Close()
 
 	if err := crush.ExtractZip(in, a.ApplicationPath, 0); err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to extract %s: %w", file, err)
+		return libcnb.Layer{}, fmt.Errorf("unable to extract %s\n%w", file, err)
 	}
 
 	return layer, nil
@@ -147,7 +147,7 @@ func (a Application) ResolveArguments() ([]string, error) {
 	if s, ok := os.LookupEnv("BP_BUILD_ARGUMENTS"); ok {
 		arguments, err = shellwords.Parse(s)
 		if err != nil {
-			return nil, fmt.Errorf("unable to parse arguments from %s: %w", s, err)
+			return nil, fmt.Errorf("unable to parse arguments from %s\n%w", s, err)
 		}
 	}
 
@@ -166,7 +166,7 @@ func (a Application) ResolveArtifact() (string, error) {
 	file := filepath.Join(a.ApplicationPath, pattern)
 	candidates, err := filepath.Glob(file)
 	if err != nil {
-		return "", fmt.Errorf("unable to find files with %s: %w", pattern, err)
+		return "", fmt.Errorf("unable to find files with %s\n%w", pattern, err)
 	}
 
 	if len(candidates) == 1 {
@@ -177,7 +177,7 @@ func (a Application) ResolveArtifact() (string, error) {
 	for _, c := range candidates {
 		ok, err := a.interestingFile(c)
 		if err != nil {
-			return "", fmt.Errorf("unable to investigate %s: %w", c, err)
+			return "", fmt.Errorf("unable to investigate %s\n%w", c, err)
 		}
 		if ok {
 			artifacts = append(artifacts, c)
@@ -200,18 +200,18 @@ func (a Application) interestingEntry(f *zip.File) (bool, error) {
 	if f.Name == "META-INF/MANIFEST.MF" {
 		m, err := f.Open()
 		if err != nil {
-			return false, fmt.Errorf("unable to open %s: %w", f.Name, err)
+			return false, fmt.Errorf("unable to open %s\n%w", f.Name, err)
 		}
 		defer m.Close()
 
 		b, err := ioutil.ReadAll(m)
 		if err != nil {
-			return false, fmt.Errorf("unable to read %s: %w", f.Name, err)
+			return false, fmt.Errorf("unable to read %s\n%w", f.Name, err)
 		}
 
 		p, err := properties.Load(b, properties.UTF8)
 		if err != nil {
-			return false, fmt.Errorf("unable to parse properties in %s: %w", f.Name, err)
+			return false, fmt.Errorf("unable to parse properties in %s\n%w", f.Name, err)
 		}
 
 		if _, ok := p.Get("Main-Class"); ok {
@@ -225,13 +225,13 @@ func (a Application) interestingEntry(f *zip.File) (bool, error) {
 func (a Application) interestingFile(path string) (bool, error) {
 	z, err := zip.OpenReader(path)
 	if err != nil {
-		return false, fmt.Errorf("unable to open %s: %w", path, err)
+		return false, fmt.Errorf("unable to open %s\n%w", path, err)
 	}
 	defer z.Close()
 
 	for _, f := range z.File {
 		if i, err := a.interestingEntry(f); err != nil {
-			return false, fmt.Errorf("unable to investigate entry %s/%s: %w", path, f.Name, err)
+			return false, fmt.Errorf("unable to investigate entry %s/%s\n%w", path, f.Name, err)
 		} else if i {
 			return true, nil
 		}

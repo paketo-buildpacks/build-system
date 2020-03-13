@@ -36,18 +36,18 @@ func NewCache(path string) Cache {
 
 func (c Cache) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	if err := os.MkdirAll(layer.Path, 0755); err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to create layer directory %s: %w", layer.Path, err)
+		return libcnb.Layer{}, fmt.Errorf("unable to create layer directory %s\n%w", layer.Path, err)
 	}
 
 	file := filepath.Dir(c.Path)
 	if err := os.MkdirAll(file, 0755); err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to create directory %s: %w", file, err)
+		return libcnb.Layer{}, fmt.Errorf("unable to create directory %s\n%w", file, err)
 	}
 
 	if err := os.Symlink(layer.Path, c.Path); os.IsExist(err) {
 		c.Logger.Body("Cache already exists")
 	} else if err != nil {
-		return libcnb.Layer{}, fmt.Errorf("unable to link cache from %s to %s: %w", layer.Path, c.Path, err)
+		return libcnb.Layer{}, fmt.Errorf("unable to link cache from %s to %s\n%w", layer.Path, c.Path, err)
 	} else {
 		c.Logger.Body("Creating cache directory %s", c.Path)
 	}

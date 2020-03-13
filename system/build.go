@@ -36,7 +36,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	dr, err := libpak.NewDependencyResolver(context)
 	if err != nil {
-		return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency resolver: %w", err)
+		return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency resolver\n%w", err)
 	}
 
 	dc := libpak.NewDependencyCache(context.Buildpack)
@@ -47,7 +47,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	for _, s := range b.Systems {
 		if ok, err := s.Participate(pr); err != nil {
-			return libcnb.BuildResult{}, fmt.Errorf("unable to determine participation: %w", err)
+			return libcnb.BuildResult{}, fmt.Errorf("unable to determine participation\n%w", err)
 		} else if !ok {
 			continue
 		}
@@ -59,18 +59,18 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 			layer, err := s.DistributionLayer(dr, dc, &result.Plan)
 			if err != nil {
-				return libcnb.BuildResult{}, fmt.Errorf("unable to create distribution layer: %w", err)
+				return libcnb.BuildResult{}, fmt.Errorf("unable to create distribution layer\n%w", err)
 			}
 			result.Layers = append(result.Layers, layer)
 		} else if err != nil {
-			return libcnb.BuildResult{}, fmt.Errorf("unable to stat %s: %w", wrapper, err)
+			return libcnb.BuildResult{}, fmt.Errorf("unable to stat %s\n%w", wrapper, err)
 		} else {
 			command = wrapper
 		}
 
 		cache, err := s.CachePath()
 		if err != nil {
-			return libcnb.BuildResult{}, fmt.Errorf("unable to determine cache location: %w", err)
+			return libcnb.BuildResult{}, fmt.Errorf("unable to determine cache location\n%w", err)
 		}
 		c := NewCache(cache)
 		c.Logger = b.Logger
@@ -78,7 +78,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 		a, err := NewApplication(context.Application.Path, command, s.DefaultArguments(), s.DefaultTarget())
 		if err != nil {
-			return libcnb.BuildResult{}, fmt.Errorf("unable to create application layer: %w", err)
+			return libcnb.BuildResult{}, fmt.Errorf("unable to create application layer\n%w", err)
 		}
 		a.Logger = b.Logger
 		result.Layers = append(result.Layers, a)

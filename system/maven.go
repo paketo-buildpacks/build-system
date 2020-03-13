@@ -39,7 +39,7 @@ func (m MavenDistribution) Contribute(layer libcnb.Layer) (libcnb.Layer, error) 
 	return m.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		m.Logger.Body("Expanding to %s", layer.Path)
 		if err := crush.ExtractTarGz(artifact, layer.Path, 1); err != nil {
-			return libcnb.Layer{}, fmt.Errorf("unable to expand Maven: %w", err)
+			return libcnb.Layer{}, fmt.Errorf("unable to expand Maven\n%w", err)
 		}
 
 		layer.Build = true
@@ -59,7 +59,7 @@ type Maven struct {
 func (Maven) CachePath() (string, error) {
 	u, err := user.Current()
 	if err != nil {
-		return "", fmt.Errorf("unable to determine user home directory: %w", err)
+		return "", fmt.Errorf("unable to determine user home directory\n%w", err)
 	}
 
 	return filepath.Join(u.HomeDir, ".m2"), nil
@@ -79,7 +79,7 @@ func (Maven) Detect(context libcnb.DetectContext, result *libcnb.DetectResult) e
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
-		return fmt.Errorf("unable to determine if %s exists: %w", file, err)
+		return fmt.Errorf("unable to determine if %s exists\n%w", file, err)
 	}
 
 	result.Pass = true
@@ -104,7 +104,7 @@ func (Maven) Distribution(layersPath string) string {
 func (m Maven) DistributionLayer(resolver libpak.DependencyResolver, cache libpak.DependencyCache, plan *libcnb.BuildpackPlan) (libcnb.LayerContributor, error) {
 	dep, err := resolver.Resolve("maven", "")
 	if err != nil {
-		return nil, fmt.Errorf("unable to find depdency: %w", err)
+		return nil, fmt.Errorf("unable to find depdency\n%w", err)
 	}
 
 	return MavenDistribution{
@@ -116,7 +116,7 @@ func (m Maven) DistributionLayer(resolver libpak.DependencyResolver, cache libpa
 func (Maven) Participate(resolver libpak.PlanEntryResolver) (bool, error) {
 	_, ok, err := resolver.Resolve("maven")
 	if err != nil {
-		return false, fmt.Errorf("unable to resolve maven plan entry: %w", err)
+		return false, fmt.Errorf("unable to resolve maven plan entry\n%w", err)
 	}
 
 	return ok, nil
