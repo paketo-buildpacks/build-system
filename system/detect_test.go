@@ -82,6 +82,6 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		system.Mock.On("Detect", mock.Anything, mock.Anything).Return(fmt.Errorf("test-error"))
 
 		_, err := detect.Detect(ctx)
-		Expect(err).To(MatchError("unable to detect: test-error"))
+		Expect(err).To(MatchError("unable to detect\ntest-error"))
 	})
 }
