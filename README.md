@@ -41,8 +41,6 @@ The buildpack will do the following for Maven projects:
 | `$BP_BUILT_MODULE` | Configure the module to find application artifact in.  Defaults to the root module (empty).
 | `$BP_BUILT_ARTIFACT` | Configure the built application artifact explicitly.  Supersedes `$BP_BUILT_MODULE`  Defaults to `build/libs/*.[jw]ar` for Gradle and `target/*.[jw]ar` for Maven.
 
-
-
 ## License
 This buildpack is released under version 2.0 of the [Apache License][a].
 
