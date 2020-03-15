@@ -1,4 +1,4 @@
-# `build-system`
+# `paketo-buildpacks/build-system`
 The Paketo Build System Buildpack is a Cloud Native Buildpack that enables the building of JVM applications from source.
 
 This buildpack is designed to work in collaboration with other buildpacks that provide JDKs.
