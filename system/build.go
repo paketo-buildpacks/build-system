@@ -32,6 +32,9 @@ type Build struct {
 }
 
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
+	b.Logger.Title(context.Buildpack)
+	result := libcnb.BuildResult{}
+
 	pr := libpak.PlanEntryResolver{Plan: context.Plan}
 
 	dr, err := libpak.NewDependencyResolver(context)
@@ -41,9 +44,6 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 
 	dc := libpak.NewDependencyCache(context.Buildpack)
 	dc.Logger = b.Logger
-
-	b.Logger.Title(context.Buildpack)
-	result := libcnb.BuildResult{}
 
 	for _, s := range b.Systems {
 		if ok, err := s.Participate(pr); err != nil {
