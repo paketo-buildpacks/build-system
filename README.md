@@ -4,7 +4,7 @@ The Paketo Build System Buildpack is a Cloud Native Buildpack that enables the b
 This buildpack is designed to work in collaboration with other buildpacks that provide JDKs.
 
 ## Behavior
-This buildpack will participate any of the following conditions are met
+This buildpack will participate if any of the following conditions are met
 
 * `<APPLICATION_ROOT>/build.gradle` exists
 * `<APPLICATION_ROOT>/build.gradle.kts` exists
