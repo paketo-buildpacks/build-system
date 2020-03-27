@@ -37,7 +37,7 @@ func (m MavenDistribution) Contribute(layer libcnb.Layer) (libcnb.Layer, error) 
 	m.LayerContributor.Logger = m.Logger
 
 	return m.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
-		m.Logger.Body("Expanding to %s", layer.Path)
+		m.Logger.Bodyf("Expanding to %s", layer.Path)
 		if err := crush.ExtractTarGz(artifact, layer.Path, 1); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to expand Maven\n%w", err)
 		}

@@ -76,7 +76,7 @@ func (a Application) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 			return libcnb.Layer{}, fmt.Errorf("unable to resolve arguments\n%w", err)
 		}
 
-		a.Logger.Body("Executing %s %s", filepath.Base(a.Command), strings.Join(arguments, " "))
+		a.Logger.Bodyf("Executing %s %s", filepath.Base(a.Command), strings.Join(arguments, " "))
 		if err := a.Executor.Execute(effect.Execution{
 			Command: a.Command,
 			Args:    arguments,

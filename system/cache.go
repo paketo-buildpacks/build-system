@@ -49,7 +49,7 @@ func (c Cache) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	} else if err != nil {
 		return libcnb.Layer{}, fmt.Errorf("unable to link cache from %s to %s\n%w", layer.Path, c.Path, err)
 	} else {
-		c.Logger.Body("Creating cache directory %s", c.Path)
+		c.Logger.Bodyf("Creating cache directory %s", c.Path)
 	}
 
 	layer.Cache = true
