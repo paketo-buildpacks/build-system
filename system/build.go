@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -51,6 +52,11 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		} else if !ok {
 			continue
 		}
+
+		b.Logger.Body(bard.FormatUserConfig("BP_BUILD_ARGUMENTS", "the arguments passed to the build system",
+			strings.Join(s.DefaultArguments(), " ")))
+		b.Logger.Body(bard.FormatUserConfig("BP_BUILT_MODULE", "the module to find application artifact in", "<ROOT>"))
+		b.Logger.Body(bard.FormatUserConfig("BP_BUILT_ARTIFACT", "the built application artifact", s.DefaultTarget()))
 
 		var command string
 		wrapper := filepath.Join(context.Application.Path, s.Wrapper())
