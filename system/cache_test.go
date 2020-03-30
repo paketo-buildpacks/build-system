@@ -48,6 +48,7 @@ func testCache(t *testing.T, context spec.G, it spec.S) {
 
 	it.After(func() {
 		Expect(os.RemoveAll(path)).To(Succeed())
+		Expect(os.RemoveAll(ctx.Layers.Path)).To(Succeed())
 	})
 
 	it("symlinks to destination if it does not exist", func() {
