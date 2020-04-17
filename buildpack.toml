@@ -22,13 +22,16 @@ version = "{{.version}}"
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
 
+[[stacks]]
+id = "org.cloudfoundry.stacks.cflinuxfs3"
+
 [[metadata.dependencies]]
 id      = "gradle"
 name    = "Gradle"
 version = "6.3"
 uri     = "https://downloads.gradle.org/distributions/gradle-6.3-bin.zip"
 sha256  = "038794feef1f4745c6347107b6726279d1c824f3fc634b60f86ace1e9fbd1768"
-stacks  = [ "io.buildpacks.stacks.bionic" ]
+stacks  = [ "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3" ]
 
   [[metadata.dependencies.licenses]]
   type = "Apache-2.0"
@@ -40,7 +43,7 @@ name    = "Apache Maven"
 version = "3.6.3"
 uri     = "https://repo1.maven.org/maven2/org/apache/maven/apache-maven/3.6.3/apache-maven-3.6.3-bin.tar.gz"
 sha256  = "26ad91d751b3a9a53087aefa743f4e16a17741d3915b219cf74112bf87a438c5"
-stacks  = [ "io.buildpacks.stacks.bionic" ]
+stacks  = [ "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3" ]
 
   [[metadata.dependencies.licenses]]
   type = "Apache-2.0"
